@@ -7,7 +7,6 @@ import com.fzb.zrlog.plugin.data.codec.ContentType;
 import com.fzb.zrlog.plugin.data.codec.HttpRequestInfo;
 import com.fzb.zrlog.plugin.data.codec.MsgPacket;
 import com.fzb.zrlog.plugin.data.codec.MsgPacketStatus;
-import com.fzb.zrlog.plugin.qiniu.util.JtwigUtil;
 import com.fzb.zrlog.plugin.type.ActionType;
 import flexjson.JSONDeserializer;
 import org.apache.log4j.Logger;
@@ -51,7 +50,7 @@ public class QiniuController {
             public void handler(MsgPacket msgPacket) {
                 Map map = new JSONDeserializer<Map>().deserialize(msgPacket.getDataStr());
                 map.put("url", requestInfo.getUrl());
-                session.sendMsg(ContentType.HTML, JtwigUtil.render(QiniuController.class.getResourceAsStream("/templates/index.twig.html"), map,session.getPlugin()), requestPacket.getMethodStr(), requestPacket.getMsgId(), MsgPacketStatus.RESPONSE_SUCCESS);
+                session.responseHtml("/templates/index.ftl", map, requestPacket.getMethodStr(), requestPacket.getMsgId());
             }
         });
 

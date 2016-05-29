@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8"/>
-    <title>{{_plugin.name}} - V{{_plugin.version}}</title>
+    <title>${_plugin.name} - V${_plugin.version}</title>
 
     <link rel="stylesheet" href="assets/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="assets/css/font-awesome.min.css"/>
@@ -24,53 +24,55 @@
 </head>
 <body>
 <div class="main-container">
-    <div class="page-content">
-        <script src="http://blog.94fzb.com/admin/js/set_update.js"></script>
-        <div class="page-header">
-            <h1>
-                云存储设置
-                <small>
-                    <i class="icon-double-angle-right"></i>
-                    信息设置
-                </small>
-            </h1>
-        </div>
-        <!-- /.page-header -->
-
+    <script src="http://blog.94fzb.com/admin/js/set_update.js"></script>
+    <div class="page-header">
+        <h1>
+            云存储设置
+            <small>
+                <i class="icon-double-angle-right"></i>
+                信息设置
+            </small>
+            <p class="text-right">
+                <a href="http://blog.zrlog.com/post/qiniu-install">如何寻找这些信息？</a>
+            </p>
+        </h1>
+    </div>
+    <!-- /.page-header -->
+    <div class="col-xs-12">
         <form class="form-horizontal" id="ajaxyunstore" role="form">
             <div class="form-group">
-                <label class="col-sm-3 control-label no-padding-right" for="form-field-1"> 七牛 ACCESS_KEY </label>
+                <label class="col-sm-3 control-label no-padding-right" for="form-field-1"> AK </label>
 
                 <div class="col-sm-9">
                     <input type="text" id="form-field-1" placeholder="" class="col-xs-10 col-sm-5"
-                           value="{{access_key}}" name="access_key">
+                           value="${access_key}" name="access_key">
                 </div>
             </div>
 
             <div class="form-group">
-                <label class="col-sm-3 control-label no-padding-right" for="form-field-1"> 七牛 SECRET_KEY </label>
+                <label class="col-sm-3 control-label no-padding-right" for="form-field-1"> SK </label>
 
                 <div class="col-sm-9">
                     <input type="text" id="form-field-1" placeholder="" class="col-xs-10 col-sm-5"
-                           value="{{secret_key}}" name="secret_key">
+                           value="${secret_key}" name="secret_key">
 
                 </div>
             </div>
 
             <div class="form-group">
-                <label class="col-sm-3 control-label no-padding-right" for="form-field-1"> 七牛HOST </label>
+                <label class="col-sm-3 control-label no-padding-right" for="form-field-1"> 域名 </label>
 
                 <div class="col-sm-9">
                     <input type="text" id="form-field-1" placeholder="" class="col-xs-10 col-sm-5"
-                           value="{{host}}" name="host">
+                           value="${host}" name="host">
 
                 </div>
             </div>
             <div class="form-group">
-                <label class="col-sm-3 control-label no-padding-right" for="form-field-1"> 七牛仓库名 </label>
+                <label class="col-sm-3 control-label no-padding-right" for="form-field-1"> 仓库名 </label>
 
                 <div class="col-sm-9">
-                    <input type="text" id="form-field-1" placeholder="" class="col-xs-10 col-sm-5" value="{{bucket}}"
+                    <input type="text" id="form-field-1" placeholder="" class="col-xs-10 col-sm-5" value="${bucket}"
                            name="bucket">
 
                 </div>
@@ -85,7 +87,6 @@
                     </button>
                 </div>
             </div>
-
         </form>
     </div>
 </div>

@@ -6,7 +6,7 @@
 
     <groupId>com.fzb.zrlog.plugin</groupId>
     <artifactId>qiniu</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.1.1</version>
 
     <dependencies>
         <dependency>
@@ -15,14 +15,9 @@
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>com.lyncode</groupId>
-            <artifactId>jtwig-core</artifactId>
-            <version>3.1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.lyncode</groupId>
-            <artifactId>jtwig-functions</artifactId>
-            <version>3.1.1</version>
+            <groupId>com.fzb.zrlog.plugin</groupId>
+            <version>1.0-SNAPSHOT</version>
+            <artifactId>freemarker-render</artifactId>
         </dependency>
         <dependency>
             <groupId>com.qiniu</groupId>

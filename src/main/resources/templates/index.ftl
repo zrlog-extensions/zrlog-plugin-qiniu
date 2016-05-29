@@ -24,7 +24,7 @@
 </head>
 <body>
 <div class="main-container">
-    <script src="http://blog.94fzb.com/admin/js/set_update.js"></script>
+    <div class="col-xs-12">
     <div class="page-header">
         <h1>
             云存储设置
@@ -38,7 +38,7 @@
         </h1>
     </div>
     <!-- /.page-header -->
-    <div class="col-xs-12">
+        <input id="gritter-light" checked="" type="checkbox" class="ace ace-switch ace-switch-5"/>
         <form class="form-horizontal" id="ajaxyunstore" role="form">
             <div class="form-group">
                 <label class="col-sm-3 control-label no-padding-right" for="form-field-1"> AK </label>
@@ -90,6 +90,5 @@
         </form>
     </div>
 </div>
-<input id="gritter-light" checked="" type="checkbox" class="ace ace-switch ace-switch-5"/>
 </body>
 </html>

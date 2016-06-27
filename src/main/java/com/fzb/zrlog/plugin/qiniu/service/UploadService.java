@@ -8,9 +8,12 @@ import com.fzb.zrlog.plugin.IOSession;
 import com.fzb.zrlog.plugin.api.IPluginService;
 import com.fzb.zrlog.plugin.api.Service;
 import com.fzb.zrlog.plugin.common.IdUtil;
+import com.fzb.zrlog.plugin.common.response.UploadFileResponse;
+import com.fzb.zrlog.plugin.common.response.UploadFileResponseEntry;
 import com.fzb.zrlog.plugin.data.codec.ContentType;
 import com.fzb.zrlog.plugin.data.codec.MsgPacket;
 import com.fzb.zrlog.plugin.data.codec.MsgPacketStatus;
+import com.fzb.zrlog.plugin.qiniu.entry.UploadFile;
 import com.fzb.zrlog.plugin.type.ActionType;
 import flexjson.JSONDeserializer;
 import org.apache.log4j.Logger;
@@ -28,26 +31,59 @@ public class UploadService implements IPluginService {
 
     @Override
     public void handle(final IOSession ioSession, final MsgPacket requestPacket) {
-        final Map<String, Object> keyMap = new HashMap<>();
-        keyMap.put("key", "bucket,access_key,secret_key,host");
-        ioSession.sendJsonMsg(keyMap, ActionType.GET_WEBSITE.name(), IdUtil.getInt(), MsgPacketStatus.SEND_REQUEST, new IMsgPacketCallBack() {
-            @Override
-            public void handler(MsgPacket responseMsgPacket) {
-                Map<String, String> responseMap = new JSONDeserializer<Map<String, String>>().deserialize(responseMsgPacket.getDataStr());
-                Map<String,Object> request = new JSONDeserializer<Map<String, Object>>().deserialize(requestPacket.getDataStr());
-                BucketVO bucket = new BucketVO(responseMap.get("bucket"), responseMap.get("access_key"),
-                        responseMap.get("secret_key"), responseMap.get("host"));
-                FileManageAPI man = new QiniuBucketManageImpl(bucket);
-                List<Map<String, Object>> responseList = new ArrayList<>();
-                List<String> fileInfoList = (List<String>) request.get("fileInfo");
-                for (String fileInfo : fileInfoList) {
-                    Map<String, Object> tempMap = new HashMap<>();
-                    String newUrl = man.create(new File(fileInfo.split(",")[0]), fileInfo.split(",")[1]).get("url").toString();
-                    tempMap.put("url", newUrl);
-                    responseList.add(tempMap);
+        Map<String, Object> request = new JSONDeserializer<Map<String, Object>>().deserialize(requestPacket.getDataStr());
+        List<String> fileInfoList = (List<String>) request.get("fileInfo");
+        List<UploadFile> uploadFileList = new ArrayList<>();
+        for (String fileInfo : fileInfoList) {
+            UploadFile uploadFile = new UploadFile();
+            uploadFile.setFile(new File(fileInfo.split(",")[0]));
+            uploadFile.setFileKey(fileInfo.split(",")[1]);
+            uploadFileList.add(uploadFile);
+        }
+        UploadFileResponse uploadFileResponse = upload(ioSession, uploadFileList);
+        List<Map<String, Object>> responseList = new ArrayList<>();
+        for (UploadFileResponseEntry entry : uploadFileResponse) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("url", entry.getUrl());
+            responseList.add(map);
+        }
+        ioSession.sendMsg(ContentType.JSON, responseList, requestPacket.getMethodStr(), requestPacket.getMsgId(), MsgPacketStatus.RESPONSE_SUCCESS);
+    }
+
+    public UploadFileResponse upload(IOSession session, final List<UploadFile> uploadFileList) {
+        final UploadFileResponse response = new UploadFileResponse();
+        if (uploadFileList != null && !uploadFileList.isEmpty()) {
+            final Map<String, Object> keyMap = new HashMap<>();
+            keyMap.put("key", "bucket,access_key,secret_key,host");
+            session.sendJsonMsg(keyMap, ActionType.GET_WEBSITE.name(), IdUtil.getInt(), MsgPacketStatus.SEND_REQUEST, new IMsgPacketCallBack() {
+                @Override
+                public void handler(MsgPacket responseMsgPacket) {
+                    Map<String, String> responseMap = new JSONDeserializer<Map<String, String>>().deserialize(responseMsgPacket.getDataStr());
+                    BucketVO bucket = new BucketVO(responseMap.get("bucket"), responseMap.get("access_key"),
+                            responseMap.get("secret_key"), responseMap.get("host"));
+                    FileManageAPI man = new QiniuBucketManageImpl(bucket);
+                    for (UploadFile uploadFile : uploadFileList) {
+                        UploadFileResponseEntry entry = new UploadFileResponseEntry();
+                        try {
+                            entry.setUrl(man.create(uploadFile.getFile(), uploadFile.getFileKey()).get("url").toString());
+                        } catch (Exception e) {
+                            LOGGER.error("upload error", e);
+                            entry.setUrl(uploadFile.getFileKey());
+                        }
+                        response.add(entry);
+                    }
                 }
-                ioSession.sendMsg(ContentType.JSON, responseList, requestPacket.getMethodStr(), requestPacket.getMsgId(), MsgPacketStatus.RESPONSE_SUCCESS);
+            });
+            //TODO too ugly, optimize sync
+            while (uploadFileList.size() != response.size()) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    LOGGER.error(e);
+                    break;
+                }
             }
-        });
+        }
+        return response;
     }
 }

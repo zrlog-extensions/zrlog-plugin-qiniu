@@ -21,7 +21,7 @@
         </dependency>
         <dependency>
             <groupId>com.fzb.zrlog.plugin</groupId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0</version>
             <artifactId>freemarker-render</artifactId>
         </dependency>
         <dependency>

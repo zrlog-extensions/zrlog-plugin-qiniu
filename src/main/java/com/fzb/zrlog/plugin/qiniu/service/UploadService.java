@@ -63,6 +63,7 @@ public class UploadService implements IPluginService {
                             responseMap.get("secret_key"), responseMap.get("host"));
                     FileManageAPI man = new QiniuBucketManageImpl(bucket);
                     for (UploadFile uploadFile : uploadFileList) {
+                        LOGGER.info("upload file " + uploadFile.getFile());
                         UploadFileResponseEntry entry = new UploadFileResponseEntry();
                         try {
                             entry.setUrl(man.create(uploadFile.getFile(), uploadFile.getFileKey()).get("url").toString());
@@ -72,6 +73,7 @@ public class UploadService implements IPluginService {
                         }
                         response.add(entry);
                     }
+                    LOGGER.info("upload file finish");
                 }
             });
             //TODO too ugly, optimize sync

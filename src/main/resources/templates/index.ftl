@@ -47,7 +47,7 @@
             <!-- /.page-header -->
             <input id="gritter-light" checked="" type="checkbox" class="ace ace-switch ace-switch-5"/>
 
-            <form class="form-horizontal" id="ajaxyunstore" role="form">
+            <form class="form-horizontal" id="ajaxyunstore" checkbox="syncTemplate" role="form">
                 <div class="form-group">
                     <label class="col-sm-3 control-label no-padding-right" for="form-field-1"> AK </label>
 
@@ -84,6 +84,18 @@
                                value="${bucket!''}"
                                name="bucket">
 
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="form-field-1"
+                           class="col-sm-3 control-label no-padding-right"> 主题静态文件同步 </label>
+
+                    <div class="col-sm-9">
+                        <label>
+                            <input type="hidden" id="syncTemplate" value="off">
+                            <input name="syncTemplate" class="ace ace-switch ace-switch-6" type="checkbox" <#if syncTemplate?? && syncTemplate =='on'>checked="checked"</#if> >
+                            <span class="lbl">&nbsp;</span>
+                        </label>
                     </div>
                 </div>
                 <div class="space-4"></div>

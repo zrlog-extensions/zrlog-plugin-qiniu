@@ -3,6 +3,7 @@ package com.fzb.zrlog.plugin.qiniu;
 
 import com.fzb.zrlog.plugin.client.NioClient;
 import com.fzb.zrlog.plugin.qiniu.controller.QiniuController;
+import com.fzb.zrlog.plugin.qiniu.handler.ConnectHandler;
 import com.fzb.zrlog.plugin.qiniu.service.UploadService;
 import com.fzb.zrlog.plugin.render.FreeMarkerRenderHandler;
 
@@ -17,7 +18,7 @@ public class Start {
     public static void main(String[] args) throws IOException {
         List<Class> classList = new ArrayList<>();
         classList.add(QiniuController.class);
-        new NioClient(null, new FreeMarkerRenderHandler()).connectServerByProperties(args, classList, "/plugin.properties", QiniuPluginAction.class, UploadService.class);
+        new NioClient(new ConnectHandler(), new FreeMarkerRenderHandler()).connectServerByProperties(args, classList, "/plugin.properties", QiniuPluginAction.class, UploadService.class);
     }
 }
 

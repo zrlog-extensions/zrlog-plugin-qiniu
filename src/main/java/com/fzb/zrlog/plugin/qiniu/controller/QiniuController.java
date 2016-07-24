@@ -44,7 +44,7 @@ public class QiniuController {
 
     public void index() {
         Map<String, Object> keyMap = new HashMap<>();
-        keyMap.put("key", "access_key,host,secret_key,bucket");
+        keyMap.put("key", "access_key,host,secret_key,bucket,syncTemplate");
         session.sendJsonMsg(keyMap, ActionType.GET_WEBSITE.name(), IdUtil.getInt(), MsgPacketStatus.SEND_REQUEST, new IMsgPacketCallBack() {
             @Override
             public void handler(MsgPacket msgPacket) {

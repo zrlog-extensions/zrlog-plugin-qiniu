@@ -80,7 +80,7 @@ public class SyncTemplateStaticResourceTimer extends TimerTask {
     }
 
     private void addToUploadFiles(List<UploadFile> uploadFiles, File f, String blogRootPath) {
-        String key = f.toString().substring(blogRootPath.length() - 1);
+        String key = f.toString().substring(blogRootPath.length() - 2);
         UploadFile uploadFile = new UploadFile();
         uploadFile.setFile(f);
         uploadFile.setFileKey(key);

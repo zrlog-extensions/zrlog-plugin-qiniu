@@ -3,7 +3,6 @@ package com.fzb.zrlog.plugin.qiniu.service;
 import com.fzb.io.api.FileManageAPI;
 import com.fzb.io.yunstore.BucketVO;
 import com.fzb.io.yunstore.QiniuBucketManageImpl;
-import com.fzb.zrlog.plugin.IMsgPacketCallBack;
 import com.fzb.zrlog.plugin.IOSession;
 import com.fzb.zrlog.plugin.api.IPluginService;
 import com.fzb.zrlog.plugin.api.Service;
@@ -55,36 +54,25 @@ public class UploadService implements IPluginService {
         if (uploadFileList != null && !uploadFileList.isEmpty()) {
             final Map<String, Object> keyMap = new HashMap<>();
             keyMap.put("key", "bucket,access_key,secret_key,host");
-            session.sendJsonMsg(keyMap, ActionType.GET_WEBSITE.name(), IdUtil.getInt(), MsgPacketStatus.SEND_REQUEST, new IMsgPacketCallBack() {
-                @Override
-                public void handler(MsgPacket responseMsgPacket) {
-                    Map<String, String> responseMap = new JSONDeserializer<Map<String, String>>().deserialize(responseMsgPacket.getDataStr());
-                    BucketVO bucket = new BucketVO(responseMap.get("bucket"), responseMap.get("access_key"),
-                            responseMap.get("secret_key"), responseMap.get("host"));
-                    FileManageAPI man = new QiniuBucketManageImpl(bucket);
-                    for (UploadFile uploadFile : uploadFileList) {
-                        LOGGER.info("upload file " + uploadFile.getFile());
-                        UploadFileResponseEntry entry = new UploadFileResponseEntry();
-                        try {
-                            entry.setUrl(man.create(uploadFile.getFile(), uploadFile.getFileKey()).get("url").toString());
-                        } catch (Exception e) {
-                            LOGGER.error("upload error", e);
-                            entry.setUrl(uploadFile.getFileKey());
-                        }
-                        response.add(entry);
-                    }
-                    LOGGER.info("upload file finish");
-                }
-            });
-            //TODO too ugly, optimize sync
-            while (uploadFileList.size() != response.size()) {
+            int msgId = IdUtil.getInt();
+            session.sendJsonMsg(keyMap, ActionType.GET_WEBSITE.name(), msgId, MsgPacketStatus.SEND_REQUEST, null);
+            MsgPacket packet = session.getResponseMsgPacketByMsgId(msgId);
+            Map<String, String> responseMap = new JSONDeserializer<Map<String, String>>().deserialize(packet.getDataStr());
+            BucketVO bucket = new BucketVO(responseMap.get("bucket"), responseMap.get("access_key"),
+                    responseMap.get("secret_key"), responseMap.get("host"));
+            FileManageAPI man = new QiniuBucketManageImpl(bucket);
+            for (UploadFile uploadFile : uploadFileList) {
+                LOGGER.info("upload file " + uploadFile.getFile());
+                UploadFileResponseEntry entry = new UploadFileResponseEntry();
                 try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    LOGGER.error(e);
-                    break;
+                    entry.setUrl(man.create(uploadFile.getFile(), uploadFile.getFileKey()).get("url").toString());
+                } catch (Exception e) {
+                    LOGGER.error("upload error", e);
+                    entry.setUrl(uploadFile.getFileKey());
                 }
+                response.add(entry);
             }
+            LOGGER.info("upload file finish");
         }
         return response;
     }

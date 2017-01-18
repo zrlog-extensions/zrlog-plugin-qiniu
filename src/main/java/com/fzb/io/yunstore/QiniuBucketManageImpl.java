@@ -2,7 +2,6 @@ package com.fzb.io.yunstore;
 
 import com.fzb.common.util.IOUtil;
 import com.fzb.io.api.FileManageAPI;
-import com.qiniu.common.QiniuException;
 import com.qiniu.http.Response;
 import com.qiniu.storage.BucketManager;
 import com.qiniu.storage.UploadManager;
@@ -10,7 +9,10 @@ import com.qiniu.storage.model.FileInfo;
 import com.qiniu.util.Auth;
 import com.qiniu.util.Etag;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -70,37 +72,31 @@ public class QiniuBucketManageImpl implements FileManageAPI {
 
     @Override
     public Map<String, Object> create(File file, String key, boolean deleteRepeat) {
-        UploadManager uploadManager = new UploadManager();
-        byte[] bytes;
-        try {
-            bytes = IOUtil.getByteByInputStream(new FileInputStream(file));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            return responseData;
-        }
         if (deleteRepeat) {
             try {
                 FileInfo fileInfo = bucketManager.stat(bucket.getBucketName(), key);
                 if (fileInfo != null) {
-                    if (!Etag.data(bytes).equals(fileInfo.hash)) {
+                    if (!Etag.stream(new FileInputStream(file), file.length()).equals(fileInfo.hash)) {
                         bucketManager.delete(bucket.getBucketName(), key);
+                    } else {
+                        responseData.put("statusCode", 200);
+                        String url = "http://" + bucket.getHost() + "/" + key;
+                        responseData.put("url", url);
+                        return responseData;
                     }
                 }
-            } catch (QiniuException e) {
-                e.printStackTrace();
+            } catch (IOException e) {
             }
         }
         try {
-            Response response = uploadManager.put(bytes, key, auth.uploadToken(bucket.getBucketName()));
+            ByteRecord byteRecord = new ByteRecord(file.length());
+            UploadManager uploadManager = new UploadManager(byteRecord);
+            Response response = uploadManager.put(file, key, auth.uploadToken(bucket.getBucketName()));
             responseData.put("statusCode", response.statusCode);
             String url = "http://" + bucket.getHost() + "/" + key;
-            /*ImageInfoRet infoRet = ImageInfo.call(url);
-            if (infoRet.width > 600) {
-                url += "?imageView2/2/w/600";
-            }*/
             responseData.put("url", url);
             return responseData;
-        } catch (QiniuException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return responseData;

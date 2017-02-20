@@ -42,7 +42,7 @@ public class QiniuController {
         });
     }
 
-    public void index() {
+    public void info() {
         Map<String, Object> keyMap = new HashMap<>();
         keyMap.put("key", "access_key,host,secret_key,bucket,syncTemplate");
         session.sendJsonMsg(keyMap, ActionType.GET_WEBSITE.name(), IdUtil.getInt(), MsgPacketStatus.SEND_REQUEST, new IMsgPacketCallBack() {
@@ -50,9 +50,13 @@ public class QiniuController {
             public void handler(MsgPacket msgPacket) {
                 Map map = new JSONDeserializer<Map>().deserialize(msgPacket.getDataStr());
                 map.put("url", requestInfo.getUrl());
-                session.responseHtml("/templates/index.ftl", map, requestPacket.getMethodStr(), requestPacket.getMsgId());
+                map.put("version", session.getPlugin().getVersion());
+                session.sendMsg(new MsgPacket(map, ContentType.JSON, MsgPacketStatus.RESPONSE_SUCCESS, requestPacket.getMsgId(), requestPacket.getMethodStr()));
             }
         });
+    }
 
+    public void index() {
+        session.responseHtml("/templates/index.html", new HashMap(), requestPacket.getMethodStr(), requestPacket.getMsgId());
     }
 }

@@ -70,7 +70,7 @@ public class UploadService implements IPluginService {
                 LOGGER.info("upload file " + uploadFile.getFile());
                 UploadFileResponseEntry entry = new UploadFileResponseEntry();
                 try {
-                    entry.setUrl(man.create(uploadFile.getFile(), uploadFile.getFileKey()).get("url").toString());
+                    entry.setUrl(man.create(uploadFile.getFile(), uploadFile.getFileKey(), true).get("url").toString());
                 } catch (Exception e) {
                     LOGGER.error("upload error", e);
                     entry.setUrl(uploadFile.getFileKey());

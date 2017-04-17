@@ -5,6 +5,7 @@ import com.fzb.zrlog.plugin.api.IConnectHandler;
 import com.fzb.zrlog.plugin.data.codec.MsgPacket;
 import com.fzb.zrlog.plugin.qiniu.timer.SyncTemplateStaticResourceTimer;
 
+import java.util.Date;
 import java.util.Timer;
 
 public class ConnectHandler implements IConnectHandler {
@@ -13,6 +14,6 @@ public class ConnectHandler implements IConnectHandler {
 
     @Override
     public void handler(IOSession ioSession, MsgPacket msgPacket) {
-        timer.schedule(new SyncTemplateStaticResourceTimer(ioSession), 0);
+        timer.scheduleAtFixedRate(new SyncTemplateStaticResourceTimer(ioSession), new Date(), 1000);
     }
 }

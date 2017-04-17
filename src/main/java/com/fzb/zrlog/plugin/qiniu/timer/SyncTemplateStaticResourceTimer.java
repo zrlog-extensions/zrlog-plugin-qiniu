@@ -23,6 +23,8 @@ public class SyncTemplateStaticResourceTimer extends TimerTask {
 
     private IOSession session;
 
+    private Map<String, Long> fileWatcherMap = new HashMap<>();
+
     public SyncTemplateStaticResourceTimer(IOSession session) {
         this.session = session;
     }
@@ -39,7 +41,6 @@ public class SyncTemplateStaticResourceTimer extends TimerTask {
                     TemplatePath templatePath = session.getResponseSync(ContentType.JSON, new HashMap(), ActionType.CURRENT_TEMPLATE, TemplatePath.class);
                     BlogRunTime blogRunTime = session.getResponseSync(ContentType.JSON, new HashMap(), ActionType.BLOG_RUN_TIME, BlogRunTime.class);
                     File templateFilePath = new File(blogRunTime.getPath() + templatePath.getValue());
-                    System.out.println(templateFilePath);
                     if (templateFilePath.isDirectory()) {
                         File propertiesFile = new File(templateFilePath + "/template.properties");
                         System.out.println(propertiesFile);
@@ -55,22 +56,10 @@ public class SyncTemplateStaticResourceTimer extends TimerTask {
                                         fileList.add(new File(templateFilePath + "/" + sFile));
                                     }
                                 }
-                                List<UploadFile> neeSyncFile = new ArrayList<>();
-                                for (File file : fileList) {
-                                    if (file.isDirectory()) {
-                                        List<File> dirFiles = IOUtil.getAllFiles(file.toString());
-                                        for (File f : dirFiles) {
-                                            addToUploadFiles(neeSyncFile, f, blogRunTime.getPath());
-                                        }
-                                    } else {
-                                        addToUploadFiles(neeSyncFile, file, blogRunTime.getPath());
-                                    }
-                                }
-                                new UploadService().upload(session, neeSyncFile);
+                                new UploadService().upload(session, convertToUploadFiles(fileList, blogRunTime.getPath()));
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
-
                         }
                     }
                 }
@@ -79,12 +68,26 @@ public class SyncTemplateStaticResourceTimer extends TimerTask {
 
     }
 
-    private void addToUploadFiles(List<UploadFile> uploadFiles, File f, String blogRootPath) {
-        String key = f.toString().substring(blogRootPath.length() - 2);
-        UploadFile uploadFile = new UploadFile();
-        uploadFile.setFile(f);
-        uploadFile.setFileKey(key);
-        uploadFiles.add(uploadFile);
+    private List<UploadFile> convertToUploadFiles(List<File> files, String blogRootPath) {
+        List<UploadFile> uploadFiles = new ArrayList<>();
+        List<File> fullFileList = new ArrayList<>();
+        for (File file : files) {
+            fullFileList.addAll(IOUtil.getAllFiles(file.toString()));
+
+        }
+        for (File file : fullFileList) {
+            if (!file.isDirectory() && file.exists()) {
+                UploadFile uploadFile = new UploadFile();
+                uploadFile.setFile(file);
+                String key = file.toString().substring(blogRootPath.length() + 1);
+                uploadFile.setFileKey(key);
+                if (fileWatcherMap.get(file.toString()) == null || fileWatcherMap.get(file.toString()) != file.lastModified()) {
+                    uploadFiles.add(uploadFile);
+                    fileWatcherMap.put(file.toString(), file.lastModified());
+                }
+            }
+        }
+        return uploadFiles;
     }
 
 }

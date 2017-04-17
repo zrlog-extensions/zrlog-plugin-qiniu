@@ -19,13 +19,13 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.*;
 
-public class SyncTemplateStaticResourceTimer extends TimerTask {
+public class SyncTemplateStaticResourceTimerTask extends TimerTask {
 
     private IOSession session;
 
     private Map<String, Long> fileWatcherMap = new HashMap<>();
 
-    public SyncTemplateStaticResourceTimer(IOSession session) {
+    public SyncTemplateStaticResourceTimerTask(IOSession session) {
         this.session = session;
     }
 

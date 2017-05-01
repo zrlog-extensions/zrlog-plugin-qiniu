@@ -41,7 +41,6 @@ public class SyncTemplateStaticResourceTimerTask extends TimerTask {
                     TemplatePath templatePath = session.getResponseSync(ContentType.JSON, new HashMap(), ActionType.CURRENT_TEMPLATE, TemplatePath.class);
                     BlogRunTime blogRunTime = session.getResponseSync(ContentType.JSON, new HashMap(), ActionType.BLOG_RUN_TIME, BlogRunTime.class);
                     File templateFilePath = new File(blogRunTime.getPath() + templatePath.getValue());
-                    System.out.println(blogRunTime.getPath());
                     if (templateFilePath.isDirectory()) {
                         File propertiesFile = new File(templateFilePath + "/template.properties");
                         System.out.println(propertiesFile);
@@ -87,7 +86,6 @@ public class SyncTemplateStaticResourceTimerTask extends TimerTask {
 
                     String key = file.toString().substring(blogRootPath.length());
                     uploadFile.setFileKey(key);
-                    System.out.println(key);
                     uploadFiles.add(uploadFile);
                     fileWatcherMap.put(file.toString(), file.lastModified());
                 }

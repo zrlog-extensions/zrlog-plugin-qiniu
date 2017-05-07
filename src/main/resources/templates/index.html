@@ -21,16 +21,18 @@
             <div id="vue-div">
                 <div class="page-header">
                     <h3>
-                        七牛云存储设置 <small>{{version}}</small>
-                        <a href="http://blog.zrlog.com/post/qiniu-install" style="float:right">如何寻找这些信息？</a>
+                        七牛云存储设置
+                        <small>{{version}}</small>
+                        <a href="http://blog.zrlog.com/post/qiniu-install" target="_blank"
+                           style="float:right">如何寻找这些信息？</a>
                     </h3>
                 </div>
                 <div class="form-group">
                     <label class="col-sm-3 control-label no-padding-right"> AccessKey </label>
 
                     <div class="col-sm-6">
-                        <input type="text" placeholder="" class="form-control"
-                               :value="val(qiniu.access_key)" name="access_key">
+                        <input type="text" placeholder="" class="form-control" :value="val(qiniu.access_key)"
+                               name="access_key">
                     </div>
                 </div>
 
@@ -38,8 +40,8 @@
                     <label class="col-sm-3 control-label no-padding-right"> SecretKey </label>
 
                     <div class="col-sm-6">
-                        <input type="text" placeholder="" class="form-control"
-                               :value="val(qiniu.secret_key)" name="secret_key">
+                        <input type="text" placeholder="" class="form-control" :value="val(qiniu.secret_key)"
+                               name="secret_key">
 
                     </div>
                 </div>

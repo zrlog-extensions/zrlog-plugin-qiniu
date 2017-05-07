@@ -49,7 +49,6 @@ public class QiniuController {
             @Override
             public void handler(MsgPacket msgPacket) {
                 Map map = new JSONDeserializer<Map>().deserialize(msgPacket.getDataStr());
-                map.put("url", requestInfo.getUrl());
                 map.put("version", session.getPlugin().getVersion());
                 session.sendMsg(new MsgPacket(map, ContentType.JSON, MsgPacketStatus.RESPONSE_SUCCESS, requestPacket.getMsgId(), requestPacket.getMethodStr()));
             }

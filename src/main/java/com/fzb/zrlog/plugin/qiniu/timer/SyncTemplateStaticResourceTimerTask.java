@@ -12,7 +12,7 @@ import com.fzb.zrlog.plugin.data.codec.MsgPacketStatus;
 import com.fzb.zrlog.plugin.qiniu.entry.UploadFile;
 import com.fzb.zrlog.plugin.qiniu.service.UploadService;
 import com.fzb.zrlog.plugin.type.ActionType;
-import flexjson.JSONDeserializer;
+import com.google.gson.Gson;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -36,7 +36,7 @@ public class SyncTemplateStaticResourceTimerTask extends TimerTask {
         session.sendJsonMsg(map, ActionType.GET_WEBSITE.name(), IdUtil.getInt(), MsgPacketStatus.SEND_REQUEST, new IMsgPacketCallBack() {
             @Override
             public void handler(MsgPacket msgPacket) {
-                Map<String, String> responseMap = new JSONDeserializer<Map<String, String>>().deserialize(msgPacket.getDataStr());
+                Map<String, String> responseMap = new Gson().fromJson(msgPacket.getDataStr(), Map.class);
                 if ("on".equals(responseMap.get("syncTemplate"))) {
                     TemplatePath templatePath = session.getResponseSync(ContentType.JSON, new HashMap(), ActionType.CURRENT_TEMPLATE, TemplatePath.class);
                     BlogRunTime blogRunTime = session.getResponseSync(ContentType.JSON, new HashMap(), ActionType.BLOG_RUN_TIME, BlogRunTime.class);

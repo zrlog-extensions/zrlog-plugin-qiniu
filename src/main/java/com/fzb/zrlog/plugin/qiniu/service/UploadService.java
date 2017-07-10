@@ -14,7 +14,7 @@ import com.fzb.zrlog.plugin.data.codec.MsgPacket;
 import com.fzb.zrlog.plugin.data.codec.MsgPacketStatus;
 import com.fzb.zrlog.plugin.qiniu.entry.UploadFile;
 import com.fzb.zrlog.plugin.type.ActionType;
-import flexjson.JSONDeserializer;
+import com.google.gson.Gson;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -30,7 +30,7 @@ public class UploadService implements IPluginService {
 
     @Override
     public void handle(final IOSession ioSession, final MsgPacket requestPacket) {
-        Map<String, Object> request = new JSONDeserializer<Map<String, Object>>().deserialize(requestPacket.getDataStr());
+        Map<String, Object> request = new Gson().fromJson(requestPacket.getDataStr(), Map.class);
         List<String> fileInfoList = (List<String>) request.get("fileInfo");
         List<UploadFile> uploadFileList = new ArrayList<>();
         for (String fileInfo : fileInfoList) {
@@ -62,7 +62,7 @@ public class UploadService implements IPluginService {
             int msgId = IdUtil.getInt();
             session.sendJsonMsg(keyMap, ActionType.GET_WEBSITE.name(), msgId, MsgPacketStatus.SEND_REQUEST, null);
             MsgPacket packet = session.getResponseMsgPacketByMsgId(msgId);
-            Map<String, String> responseMap = new JSONDeserializer<Map<String, String>>().deserialize(packet.getDataStr());
+            Map<String, String> responseMap = new Gson().fromJson(packet.getDataStr(), Map.class);
             BucketVO bucket = new BucketVO(responseMap.get("bucket"), responseMap.get("access_key"),
                     responseMap.get("secret_key"), responseMap.get("host"));
             FileManageAPI man = new QiniuBucketManageImpl(bucket);

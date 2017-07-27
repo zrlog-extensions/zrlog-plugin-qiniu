@@ -7,7 +7,7 @@ $(function(){
         },
         mounted : function(){
             $.get("info",function(e){
-                $("#syncTemplate-switch").bootstrapSwitch('state', e.syncTemplate);
+                $("#syncTemplate-switch").bootstrapSwitch('state', e.syncTemplate == 'on');
                 $("#syncTemplate-switch").attr("value",e.syncTemplate);
                 qiniu.$set(qiniu,'qiniu',e);
                 qiniu.$set(qiniu,'version','v'+e.version);

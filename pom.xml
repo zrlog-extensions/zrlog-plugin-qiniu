@@ -6,7 +6,7 @@
 
     <groupId>com.fzb.zrlog.plugin</groupId>
     <artifactId>qiniu</artifactId>
-    <version>1.2.7</version>
+    <version>1.2.10</version>
 
     <properties>
         <outputDirectory>/home/xiaochun/zrlog-plugin/</outputDirectory>

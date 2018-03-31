@@ -1,14 +1,14 @@
-package com.fzb.zrlog.plugin.qiniu.controller;
+package com.zrlog.plugin.qiniu.controller;
 
-import com.fzb.zrlog.plugin.IMsgPacketCallBack;
-import com.fzb.zrlog.plugin.IOSession;
-import com.fzb.zrlog.plugin.common.IdUtil;
-import com.fzb.zrlog.plugin.data.codec.ContentType;
-import com.fzb.zrlog.plugin.data.codec.HttpRequestInfo;
-import com.fzb.zrlog.plugin.data.codec.MsgPacket;
-import com.fzb.zrlog.plugin.data.codec.MsgPacketStatus;
-import com.fzb.zrlog.plugin.type.ActionType;
 import com.google.gson.Gson;
+import com.zrlog.plugin.IMsgPacketCallBack;
+import com.zrlog.plugin.IOSession;
+import com.zrlog.plugin.common.IdUtil;
+import com.zrlog.plugin.data.codec.ContentType;
+import com.zrlog.plugin.data.codec.HttpRequestInfo;
+import com.zrlog.plugin.data.codec.MsgPacket;
+import com.zrlog.plugin.data.codec.MsgPacketStatus;
+import com.zrlog.plugin.type.ActionType;
 import org.apache.log4j.Logger;
 
 import java.util.HashMap;

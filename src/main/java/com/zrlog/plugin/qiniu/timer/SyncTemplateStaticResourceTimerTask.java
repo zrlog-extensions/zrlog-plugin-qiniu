@@ -1,18 +1,18 @@
-package com.fzb.zrlog.plugin.qiniu.timer;
+package com.zrlog.plugin.qiniu.timer;
 
-import com.fzb.common.util.IOUtil;
-import com.fzb.zrlog.plugin.IMsgPacketCallBack;
-import com.fzb.zrlog.plugin.IOSession;
-import com.fzb.zrlog.plugin.common.IdUtil;
-import com.fzb.zrlog.plugin.common.modle.BlogRunTime;
-import com.fzb.zrlog.plugin.common.modle.TemplatePath;
-import com.fzb.zrlog.plugin.data.codec.ContentType;
-import com.fzb.zrlog.plugin.data.codec.MsgPacket;
-import com.fzb.zrlog.plugin.data.codec.MsgPacketStatus;
-import com.fzb.zrlog.plugin.qiniu.entry.UploadFile;
-import com.fzb.zrlog.plugin.qiniu.service.UploadService;
-import com.fzb.zrlog.plugin.type.ActionType;
 import com.google.gson.Gson;
+import com.hibegin.common.util.FileUtils;
+import com.zrlog.plugin.IMsgPacketCallBack;
+import com.zrlog.plugin.IOSession;
+import com.zrlog.plugin.common.IdUtil;
+import com.zrlog.plugin.common.modle.BlogRunTime;
+import com.zrlog.plugin.common.modle.TemplatePath;
+import com.zrlog.plugin.data.codec.ContentType;
+import com.zrlog.plugin.data.codec.MsgPacket;
+import com.zrlog.plugin.data.codec.MsgPacketStatus;
+import com.zrlog.plugin.qiniu.entry.UploadFile;
+import com.zrlog.plugin.qiniu.service.UploadService;
+import com.zrlog.plugin.type.ActionType;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -43,7 +43,6 @@ public class SyncTemplateStaticResourceTimerTask extends TimerTask {
                     File templateFilePath = new File(blogRunTime.getPath() + templatePath.getValue());
                     if (templateFilePath.isDirectory()) {
                         File propertiesFile = new File(templateFilePath + "/template.properties");
-                        System.out.println(propertiesFile);
                         if (propertiesFile.exists()) {
                             Properties prop = new Properties();
                             try {
@@ -72,7 +71,7 @@ public class SyncTemplateStaticResourceTimerTask extends TimerTask {
         List<UploadFile> uploadFiles = new ArrayList<>();
         List<File> fullFileList = new ArrayList<>();
         for (File file : files) {
-            fullFileList.addAll(IOUtil.getAllFiles(file.toString()));
+            FileUtils.getAllFiles(file.toString(), fullFileList);
 
         }
         if (!blogRootPath.endsWith("/")) {

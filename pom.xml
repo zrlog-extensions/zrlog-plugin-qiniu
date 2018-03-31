@@ -4,9 +4,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.fzb.zrlog.plugin</groupId>
-    <artifactId>qiniu</artifactId>
-    <version>1.2.10</version>
+    <groupId>com.zrlog</groupId>
+    <artifactId>plugin-qiniu</artifactId>
+    <version>1.4.0</version>
 
     <properties>
         <outputDirectory>/home/xiaochun/zrlog-plugin/</outputDirectory>
@@ -15,23 +15,19 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.fzb.zrlog.plugin</groupId>
-            <artifactId>common</artifactId>
-            <version>1.2.5</version>
+            <groupId>com.zrlog</groupId>
+            <artifactId>plugin-common</artifactId>
+            <version>1.3.0</version>
         </dependency>
         <dependency>
             <groupId>com.qiniu</groupId>
             <artifactId>qiniu-java-sdk</artifactId>
             <version>7.1.3</version>
         </dependency>
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.17</version>
-        </dependency>
     </dependencies>
 
     <build>
+        <finalName>qiniu</finalName>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
@@ -57,7 +53,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.fzb.zrlog.plugin.qiniu.Start</mainClass>
+                            <mainClass>com.zrlog.plugin.qiniu.QiniuPluginApplication</mainClass>
                         </manifest>
                     </archive>
                     <finalName>qiniu</finalName>

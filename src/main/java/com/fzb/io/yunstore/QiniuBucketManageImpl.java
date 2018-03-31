@@ -1,7 +1,7 @@
 package com.fzb.io.yunstore;
 
-import com.fzb.common.util.IOUtil;
 import com.fzb.io.api.FileManageAPI;
+import com.hibegin.common.util.IOUtil;
 import com.qiniu.http.Response;
 import com.qiniu.storage.BucketManager;
 import com.qiniu.storage.UploadManager;

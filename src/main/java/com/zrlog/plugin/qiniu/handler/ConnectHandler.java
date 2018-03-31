@@ -1,9 +1,9 @@
-package com.fzb.zrlog.plugin.qiniu.handler;
+package com.zrlog.plugin.qiniu.handler;
 
-import com.fzb.zrlog.plugin.IOSession;
-import com.fzb.zrlog.plugin.api.IConnectHandler;
-import com.fzb.zrlog.plugin.data.codec.MsgPacket;
-import com.fzb.zrlog.plugin.qiniu.timer.SyncTemplateStaticResourceTimerTask;
+import com.zrlog.plugin.IOSession;
+import com.zrlog.plugin.api.IConnectHandler;
+import com.zrlog.plugin.data.codec.MsgPacket;
+import com.zrlog.plugin.qiniu.timer.SyncTemplateStaticResourceTimerTask;
 
 import java.util.Date;
 import java.util.Timer;

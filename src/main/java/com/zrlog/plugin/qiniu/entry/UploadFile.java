@@ -1,4 +1,4 @@
-package com.fzb.zrlog.plugin.qiniu.entry;
+package com.zrlog.plugin.qiniu.entry;
 
 import java.io.File;
 

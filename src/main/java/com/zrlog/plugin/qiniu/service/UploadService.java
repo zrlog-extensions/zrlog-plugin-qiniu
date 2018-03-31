@@ -1,20 +1,21 @@
-package com.fzb.zrlog.plugin.qiniu.service;
+package com.zrlog.plugin.qiniu.service;
 
 import com.fzb.io.api.FileManageAPI;
 import com.fzb.io.yunstore.BucketVO;
 import com.fzb.io.yunstore.QiniuBucketManageImpl;
-import com.fzb.zrlog.plugin.IOSession;
-import com.fzb.zrlog.plugin.api.IPluginService;
-import com.fzb.zrlog.plugin.api.Service;
-import com.fzb.zrlog.plugin.common.IdUtil;
-import com.fzb.zrlog.plugin.common.response.UploadFileResponse;
-import com.fzb.zrlog.plugin.common.response.UploadFileResponseEntry;
-import com.fzb.zrlog.plugin.data.codec.ContentType;
-import com.fzb.zrlog.plugin.data.codec.MsgPacket;
-import com.fzb.zrlog.plugin.data.codec.MsgPacketStatus;
-import com.fzb.zrlog.plugin.qiniu.entry.UploadFile;
-import com.fzb.zrlog.plugin.type.ActionType;
+
+import com.zrlog.plugin.IOSession;
+import com.zrlog.plugin.api.IPluginService;
+import com.zrlog.plugin.api.Service;
+import com.zrlog.plugin.common.IdUtil;
+import com.zrlog.plugin.common.response.UploadFileResponse;
+import com.zrlog.plugin.common.response.UploadFileResponseEntry;
+import com.zrlog.plugin.data.codec.ContentType;
+import com.zrlog.plugin.data.codec.MsgPacket;
+import com.zrlog.plugin.data.codec.MsgPacketStatus;
+import com.zrlog.plugin.qiniu.entry.UploadFile;
 import com.google.gson.Gson;
+import com.zrlog.plugin.type.ActionType;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -63,22 +64,24 @@ public class UploadService implements IPluginService {
             session.sendJsonMsg(keyMap, ActionType.GET_WEBSITE.name(), msgId, MsgPacketStatus.SEND_REQUEST, null);
             MsgPacket packet = session.getResponseMsgPacketByMsgId(msgId);
             Map<String, String> responseMap = new Gson().fromJson(packet.getDataStr(), Map.class);
-            BucketVO bucket = new BucketVO(responseMap.get("bucket"), responseMap.get("access_key"),
-                    responseMap.get("secret_key"), responseMap.get("host"));
-            FileManageAPI man = new QiniuBucketManageImpl(bucket);
             for (UploadFile uploadFile : uploadFileList) {
-                LOGGER.info("upload file " + uploadFile.getFile());
-                UploadFileResponseEntry entry = new UploadFileResponseEntry();
-                try {
-                    entry.setUrl(man.create(uploadFile.getFile(), uploadFile.getFileKey(), true).get("url").toString());
-                } catch (Exception e) {
-                    LOGGER.error("upload error", e);
-                    entry.setUrl(uploadFile.getFileKey());
-                }
-                response.add(entry);
+                BucketVO bucket = new BucketVO(responseMap.get("bucket"), responseMap.get("access_key"), responseMap.get("secret_key"), responseMap.get("host"));
+                response.add(doUpload(bucket, uploadFile));
             }
-            LOGGER.info("upload file finish");
         }
         return response;
+    }
+
+    private UploadFileResponseEntry doUpload(BucketVO bucketVO, UploadFile uploadFile) {
+        UploadFileResponseEntry entry = new UploadFileResponseEntry();
+        try {
+            FileManageAPI man = new QiniuBucketManageImpl(bucketVO);
+            entry.setUrl(man.create(uploadFile.getFile(), uploadFile.getFileKey(), true).get("url").toString());
+            LOGGER.info("upload file " + uploadFile.getFile() + " success");
+        } catch (Exception e) {
+            LOGGER.error("upload file " + uploadFile.getFile() + " error", e);
+            entry.setUrl(uploadFile.getFileKey());
+        }
+        return entry;
     }
 }

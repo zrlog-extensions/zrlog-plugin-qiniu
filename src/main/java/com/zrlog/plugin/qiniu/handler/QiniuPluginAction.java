@@ -1,10 +1,10 @@
-package com.fzb.zrlog.plugin.qiniu;
+package com.zrlog.plugin.qiniu.handler;
 
-import com.fzb.zrlog.plugin.IOSession;
-import com.fzb.zrlog.plugin.api.IPluginAction;
-import com.fzb.zrlog.plugin.data.codec.HttpRequestInfo;
-import com.fzb.zrlog.plugin.data.codec.MsgPacket;
-import com.fzb.zrlog.plugin.qiniu.controller.QiniuController;
+import com.zrlog.plugin.IOSession;
+import com.zrlog.plugin.api.IPluginAction;
+import com.zrlog.plugin.data.codec.HttpRequestInfo;
+import com.zrlog.plugin.data.codec.MsgPacket;
+import com.zrlog.plugin.qiniu.controller.QiniuController;
 import com.google.gson.Gson;
 
 public class QiniuPluginAction implements IPluginAction {

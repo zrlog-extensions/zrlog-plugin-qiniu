@@ -7,7 +7,8 @@ jobs:
   build:
     name: Plugin on ${{ matrix.os }} ${{ matrix.architecture }}
     runs-on: ${{ matrix.os }}
-
+    env:
+      SSH_HOST_KEY: ${{ vars.SSH_HOST_KEY }}
     strategy:
       matrix:
         os: [ windows-latest ]

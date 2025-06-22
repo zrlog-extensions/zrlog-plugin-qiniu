@@ -3,6 +3,7 @@ package com.fzb.io.yunstore;
 import com.fzb.io.api.FileManageAPI;
 import com.qiniu.http.Response;
 import com.qiniu.storage.BucketManager;
+import com.qiniu.storage.Configuration;
 import com.qiniu.storage.UploadManager;
 import com.qiniu.storage.model.FileInfo;
 import com.qiniu.util.Auth;
@@ -18,16 +19,16 @@ import java.util.Map;
 
 public class QiniuBucketManageImpl implements FileManageAPI {
 
-    private Map<String, Object> responseData = new HashMap<String, Object>();
+    private final Map<String, Object> responseData = new HashMap<String, Object>();
 
-    private BucketVO bucket;
-    private Auth auth;
-    private BucketManager bucketManager;
+    private final BucketVO bucket;
+    private final Auth auth;
+    private final BucketManager bucketManager;
 
     public QiniuBucketManageImpl(BucketVO bucket) {
         this.bucket = bucket;
         auth = Auth.create(bucket.getAccessKey(), bucket.getSecretKey());
-        bucketManager = new BucketManager(auth);
+        bucketManager = new BucketManager(auth, Configuration.create());
     }
 
     @Override
@@ -90,7 +91,7 @@ public class QiniuBucketManageImpl implements FileManageAPI {
         }
         try {
             ByteRecord byteRecord = new ByteRecord(file.length());
-            UploadManager uploadManager = new UploadManager(byteRecord);
+            UploadManager uploadManager = new UploadManager(Configuration.create(), byteRecord);
             Response response = uploadManager.put(file, key, auth.uploadToken(bucket.getBucketName()));
             responseData.put("statusCode", response.statusCode);
             String url = "http://" + bucket.getHost() + "/" + key;

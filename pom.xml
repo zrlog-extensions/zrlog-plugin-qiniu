@@ -23,7 +23,6 @@
             <artifactId>zrlog-plugin-common</artifactId>
             <version>3.0.31</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/com.aliyun/aliyun-java-sdk-cdn -->
         <dependency>
             <groupId>com.qiniu</groupId>
             <artifactId>qiniu-java-sdk</artifactId>

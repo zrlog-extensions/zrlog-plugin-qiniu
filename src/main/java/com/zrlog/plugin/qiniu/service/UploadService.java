@@ -4,7 +4,6 @@ import com.fzb.io.api.FileManageAPI;
 import com.fzb.io.yunstore.BucketVO;
 import com.fzb.io.yunstore.QiniuBucketManageImpl;
 
-import com.sun.org.slf4j.internal.LoggerFactory;
 import com.zrlog.plugin.IOSession;
 import com.zrlog.plugin.api.IPluginService;
 import com.zrlog.plugin.api.Service;

@@ -6,6 +6,7 @@ import com.qiniu.storage.BucketManager;
 import com.qiniu.storage.Configuration;
 import com.qiniu.storage.UploadManager;
 import com.qiniu.storage.model.FileInfo;
+import com.qiniu.storage.persistent.FileRecorder;
 import com.qiniu.util.Auth;
 import com.qiniu.util.Etag;
 import com.zrlog.plugin.common.IOUtil;
@@ -14,6 +15,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -77,7 +79,7 @@ public class QiniuBucketManageImpl implements FileManageAPI {
             try {
                 FileInfo fileInfo = bucketManager.stat(bucket.getBucketName(), key);
                 if (fileInfo != null) {
-                    if (!Etag.stream(new FileInputStream(file), file.length()).equals(fileInfo.hash)) {
+                    if (!Etag.stream(Files.newInputStream(file.toPath()), file.length()).equals(fileInfo.hash)) {
                         bucketManager.delete(bucket.getBucketName(), key);
                     } else {
                         responseData.put("statusCode", 200);
@@ -90,8 +92,8 @@ public class QiniuBucketManageImpl implements FileManageAPI {
             }
         }
         try {
-            ByteRecord byteRecord = new ByteRecord(file.length());
-            UploadManager uploadManager = new UploadManager(Configuration.create(), byteRecord);
+            FileRecorder fileRecorder = new FileRecorder(file);
+            UploadManager uploadManager = new UploadManager(Configuration.create(), fileRecorder);
             Response response = uploadManager.put(file, key, auth.uploadToken(bucket.getBucketName()));
             responseData.put("statusCode", response.statusCode);
             String url = "http://" + bucket.getHost() + "/" + key;

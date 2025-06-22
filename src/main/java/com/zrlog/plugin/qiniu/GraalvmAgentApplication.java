@@ -9,6 +9,8 @@ import com.zrlog.plugin.qiniu.service.UploadService;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
@@ -16,11 +18,12 @@ import java.util.TreeMap;
 public class GraalvmAgentApplication {
 
 
-    public static void main(String[] args) throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException {
+    public static void main(String[] args) throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, InvocationTargetException {
         //upload need set content-type
         PluginNativeImageUtils.usedGsonObject();
-        Object decode = Json.decode("{}", Class.forName("com.qiniu.util.UC$UCRet"));
-        System.out.println("decode = " + decode);
+        //Class<?> aClass = Class.forName("com.qiniu.util.UC$UCRet");
+        //Object decode = Json.decode("{}", aClass);
+        //System.out.println("decode = " + decode);
         //RefreshObjectCachesResponse refreshObjectCachesResponse = new RefreshObjectCachesResponse();
         //refreshObjectCachesResponse.setRefreshTaskId("");
         //refreshObjectCachesResponse.setRequestId("");

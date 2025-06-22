@@ -92,8 +92,7 @@ public class QiniuBucketManageImpl implements FileManageAPI {
             }
         }
         try {
-            FileRecorder fileRecorder = new FileRecorder(file);
-            UploadManager uploadManager = new UploadManager(Configuration.create(), fileRecorder);
+            UploadManager uploadManager = new UploadManager(Configuration.create());
             Response response = uploadManager.put(file, key, auth.uploadToken(bucket.getBucketName()));
             responseData.put("statusCode", response.statusCode);
             String url = "http://" + bucket.getHost() + "/" + key;

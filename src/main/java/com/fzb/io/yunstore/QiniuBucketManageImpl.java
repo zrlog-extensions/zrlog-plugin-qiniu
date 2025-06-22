@@ -4,6 +4,7 @@ import com.fzb.io.api.FileManageAPI;
 import com.qiniu.http.Response;
 import com.qiniu.storage.BucketManager;
 import com.qiniu.storage.Configuration;
+import com.qiniu.storage.Region;
 import com.qiniu.storage.UploadManager;
 import com.qiniu.storage.model.FileInfo;
 import com.qiniu.storage.persistent.FileRecorder;
@@ -26,11 +27,13 @@ public class QiniuBucketManageImpl implements FileManageAPI {
     private final BucketVO bucket;
     private final Auth auth;
     private final BucketManager bucketManager;
+    private final Configuration cfg;
 
     public QiniuBucketManageImpl(BucketVO bucket) {
         this.bucket = bucket;
         auth = Auth.create(bucket.getAccessKey(), bucket.getSecretKey());
-        bucketManager = new BucketManager(auth, Configuration.create());
+        this.cfg = Configuration.create(Region.autoRegion());
+        bucketManager = new BucketManager(auth, cfg);
     }
 
     @Override
@@ -92,7 +95,7 @@ public class QiniuBucketManageImpl implements FileManageAPI {
             }
         }
         try {
-            UploadManager uploadManager = new UploadManager(Configuration.create());
+            UploadManager uploadManager = new UploadManager(cfg);
             Response response = uploadManager.put(file, key, auth.uploadToken(bucket.getBucketName()));
             responseData.put("statusCode", response.statusCode);
             String url = "http://" + bucket.getHost() + "/" + key;

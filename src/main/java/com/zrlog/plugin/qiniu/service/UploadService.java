@@ -4,10 +4,12 @@ import com.fzb.io.api.FileManageAPI;
 import com.fzb.io.yunstore.BucketVO;
 import com.fzb.io.yunstore.QiniuBucketManageImpl;
 
+import com.sun.org.slf4j.internal.LoggerFactory;
 import com.zrlog.plugin.IOSession;
 import com.zrlog.plugin.api.IPluginService;
 import com.zrlog.plugin.api.Service;
 import com.zrlog.plugin.common.IdUtil;
+import com.zrlog.plugin.common.LoggerUtil;
 import com.zrlog.plugin.common.response.UploadFileResponse;
 import com.zrlog.plugin.common.response.UploadFileResponseEntry;
 import com.zrlog.plugin.data.codec.ContentType;
@@ -16,18 +18,18 @@ import com.zrlog.plugin.data.codec.MsgPacketStatus;
 import com.zrlog.plugin.qiniu.entry.UploadFile;
 import com.google.gson.Gson;
 import com.zrlog.plugin.type.ActionType;
-import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 @Service("uploadService")
 public class UploadService implements IPluginService {
 
-    private static Logger LOGGER = Logger.getLogger(UploadService.class);
+    private static final Logger LOGGER = LoggerUtil.getLogger(UploadService.class);
 
     @Override
     public void handle(final IOSession ioSession, final MsgPacket requestPacket) {
@@ -79,7 +81,7 @@ public class UploadService implements IPluginService {
             entry.setUrl(man.create(uploadFile.getFile(), uploadFile.getFileKey(), true).get("url").toString());
             LOGGER.info("upload file " + uploadFile.getFile() + " success");
         } catch (Exception e) {
-            LOGGER.error("upload file " + uploadFile.getFile() + " error", e);
+            LOGGER.severe("upload file " + uploadFile.getFile() + " error, " + e.getMessage());
             entry.setUrl(uploadFile.getFileKey());
         }
         return entry;

@@ -2,10 +2,10 @@ package com.zrlog.plugin.qiniu;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.qiniu.util.Json;
 import com.zrlog.plugin.common.PluginNativeImageUtils;
 import com.zrlog.plugin.qiniu.controller.QiniuController;
 import com.zrlog.plugin.qiniu.service.UploadService;
-
 
 import java.io.File;
 import java.io.IOException;
@@ -16,9 +16,11 @@ import java.util.TreeMap;
 public class GraalvmAgentApplication {
 
 
-    public static void main(String[] args) throws IOException, InstantiationException, IllegalAccessException {
+    public static void main(String[] args) throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException {
         //upload need set content-type
         PluginNativeImageUtils.usedGsonObject();
+        Object decode = Json.decode("{}", Class.forName("com.qiniu.util.UC$UCRet"));
+        System.out.println("decode = " + decode);
         //RefreshObjectCachesResponse refreshObjectCachesResponse = new RefreshObjectCachesResponse();
         //refreshObjectCachesResponse.setRefreshTaskId("");
         //refreshObjectCachesResponse.setRequestId("");
@@ -27,6 +29,7 @@ public class GraalvmAgentApplication {
         //RefreshObjectCachesRequest refreshObjectCachesRequest = new RefreshObjectCachesRequest();
         //refreshObjectCachesRequest.setObjectPath("Test");
         //builder.create().toJson(refreshObjectCachesRequest);
+
         new Gson().toJson(new TreeMap<>());
         new Gson().fromJson("{}", Map.class);
         //new RefreshCdnWorker("test", "test", "oss-cn-chengdu.aliyuncs.com").start(Arrays.asList("https://blog.zrlog.com/?"));

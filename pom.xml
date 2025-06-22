@@ -148,7 +148,7 @@
                                     -H:+BuildReport
                                     -H:+AddAllCharsets
                                     -H:+UnlockExperimentalVMOptions
-                                    --initialize-at-build-time=org.apache.commons.logging.LogFactory
+                                    --initialize-at-build-time=UCRet
                                     --initialize-at-build-time=org.apache.commons.logging.impl.LogFactoryImpl
                                     --initialize-at-build-time=com.aliyun.oss.internal.OSSUtils
                                     --initialize-at-build-time=com.aliyun.oss.ClientBuilderConfiguration

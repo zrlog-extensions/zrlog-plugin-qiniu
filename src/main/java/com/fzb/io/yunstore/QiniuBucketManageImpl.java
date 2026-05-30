@@ -1,33 +1,39 @@
 package com.fzb.io.yunstore;
 
 import com.fzb.io.api.FileManageAPI;
-import com.zrlog.plugin.common.IOUtil;
 import com.qiniu.http.Response;
 import com.qiniu.storage.BucketManager;
+import com.qiniu.storage.Configuration;
+import com.qiniu.storage.Region;
 import com.qiniu.storage.UploadManager;
 import com.qiniu.storage.model.FileInfo;
+import com.qiniu.storage.persistent.FileRecorder;
 import com.qiniu.util.Auth;
 import com.qiniu.util.Etag;
+import com.zrlog.plugin.common.IOUtil;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 
 public class QiniuBucketManageImpl implements FileManageAPI {
 
-    private Map<String, Object> responseData = new HashMap<String, Object>();
+    private final Map<String, Object> responseData = new HashMap<String, Object>();
 
-    private BucketVO bucket;
-    private Auth auth;
-    private BucketManager bucketManager;
+    private final BucketVO bucket;
+    private final Auth auth;
+    private final BucketManager bucketManager;
+    private final Configuration cfg;
 
     public QiniuBucketManageImpl(BucketVO bucket) {
         this.bucket = bucket;
         auth = Auth.create(bucket.getAccessKey(), bucket.getSecretKey());
-        bucketManager = new BucketManager(auth);
+        this.cfg = Configuration.create(Region.autoRegion());
+        bucketManager = new BucketManager(auth, cfg);
     }
 
     @Override
@@ -76,7 +82,7 @@ public class QiniuBucketManageImpl implements FileManageAPI {
             try {
                 FileInfo fileInfo = bucketManager.stat(bucket.getBucketName(), key);
                 if (fileInfo != null) {
-                    if (!Etag.stream(new FileInputStream(file), file.length()).equals(fileInfo.hash)) {
+                    if (!Etag.stream(Files.newInputStream(file.toPath()), file.length()).equals(fileInfo.hash)) {
                         bucketManager.delete(bucket.getBucketName(), key);
                     } else {
                         responseData.put("statusCode", 200);
@@ -89,8 +95,7 @@ public class QiniuBucketManageImpl implements FileManageAPI {
             }
         }
         try {
-            ByteRecord byteRecord = new ByteRecord(file.length());
-            UploadManager uploadManager = new UploadManager(byteRecord);
+            UploadManager uploadManager = new UploadManager(cfg);
             Response response = uploadManager.put(file, key, auth.uploadToken(bucket.getBucketName()));
             responseData.put("statusCode", response.statusCode);
             String url = "http://" + bucket.getHost() + "/" + key;

@@ -1,5 +1,3 @@
-/bin
-
 .idea
 **/logs
 *.pid
@@ -15,3 +13,4 @@
 *.*~
 *.log
 !.mvn/wrapper/maven-wrapper.jar
+log

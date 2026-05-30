@@ -18,9 +18,9 @@ import java.util.Map;
  */
 public class QiniuController {
 
-    private IOSession session;
-    private MsgPacket requestPacket;
-    private HttpRequestInfo requestInfo;
+    private final IOSession session;
+    private final MsgPacket requestPacket;
+    private final HttpRequestInfo requestInfo;
 
     public QiniuController(IOSession session, MsgPacket requestPacket, HttpRequestInfo requestInfo) {
         this.session = session;

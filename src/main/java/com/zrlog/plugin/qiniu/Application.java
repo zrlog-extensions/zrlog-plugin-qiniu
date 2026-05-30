@@ -7,6 +7,7 @@ import com.zrlog.plugin.qiniu.handler.ConnectHandler;
 import com.zrlog.plugin.qiniu.handler.QiniuPluginAction;
 import com.zrlog.plugin.qiniu.service.QiniuStaticSyncService;
 import com.zrlog.plugin.qiniu.service.UploadService;
+import com.zrlog.plugin.render.SimpleTemplateRender;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,7 +21,7 @@ public class Application {
     public static void main(String[] args) throws IOException {
         List<Class<?>> classList = new ArrayList<>();
         classList.add(QiniuController.class);
-        new NioClient(new ConnectHandler(), null)
+        new NioClient(new ConnectHandler(), new SimpleTemplateRender())
                 .connectServer(args, classList, QiniuPluginAction.class,
                         Arrays.asList(UploadService.class, QiniuStaticSyncService.class));
     }

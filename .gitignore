@@ -14,3 +14,7 @@
 *.log
 !.mvn/wrapper/maven-wrapper.jar
 log
+node_modules/
+*.tsbuildinfo
+src/main/frontend/build
+src/main/resources/templates

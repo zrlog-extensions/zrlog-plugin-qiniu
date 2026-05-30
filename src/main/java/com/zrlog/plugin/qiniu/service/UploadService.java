@@ -33,8 +33,8 @@ import java.util.logging.Logger;
 @Capability(
         key = "qiniu.upload",
         type = "service",
-        label = "上传七牛云资源",
-        description = "上传文章附件或生成资源到七牛云存储",
+        label = "上传到七牛云存储",
+        description = "上传文章附件和生成资源到七牛云存储。",
         exposure = {"internal"},
         timeoutSeconds = 120
 )

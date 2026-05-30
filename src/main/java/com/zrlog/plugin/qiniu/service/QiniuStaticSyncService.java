@@ -16,7 +16,7 @@ import java.util.Map;
 @ScheduledCapability(
         key = "qiniu.syncStaticResources",
         label = "同步七牛云静态资源",
-        description = "同步模板静态资源到七牛云存储",
+        description = "同步模板静态资源到七牛云存储。",
         defaultCron = "*/5 * * * *",
         timeoutSeconds = 300
 )

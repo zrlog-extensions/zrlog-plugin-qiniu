@@ -5,10 +5,12 @@ import com.zrlog.plugin.client.NioClient;
 import com.zrlog.plugin.qiniu.controller.QiniuController;
 import com.zrlog.plugin.qiniu.handler.ConnectHandler;
 import com.zrlog.plugin.qiniu.handler.QiniuPluginAction;
+import com.zrlog.plugin.qiniu.service.QiniuStaticSyncService;
 import com.zrlog.plugin.qiniu.service.UploadService;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class QiniuPluginApplication {
@@ -16,9 +18,10 @@ public class QiniuPluginApplication {
      * @param args
      */
     public static void main(String[] args) throws IOException {
-        List<Class> classList = new ArrayList<>();
+        List<Class<?>> classList = new ArrayList<>();
         classList.add(QiniuController.class);
-        new NioClient(new ConnectHandler(), null).connectServer(args, classList, QiniuPluginAction.class, UploadService.class);
+        new NioClient(new ConnectHandler(), null)
+                .connectServer(args, classList, QiniuPluginAction.class,
+                        Arrays.asList(UploadService.class, QiniuStaticSyncService.class));
     }
 }
-

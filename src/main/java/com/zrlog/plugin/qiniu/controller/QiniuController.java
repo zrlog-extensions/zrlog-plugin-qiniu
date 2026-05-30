@@ -9,7 +9,6 @@ import com.zrlog.plugin.data.codec.HttpRequestInfo;
 import com.zrlog.plugin.data.codec.MsgPacket;
 import com.zrlog.plugin.data.codec.MsgPacketStatus;
 import com.zrlog.plugin.type.ActionType;
-import org.apache.log4j.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,8 +17,6 @@ import java.util.Map;
  * Created by xiaochun on 2016/2/13.
  */
 public class QiniuController {
-
-    private static Logger LOGGER = Logger.getLogger(QiniuController.class);
 
     private IOSession session;
     private MsgPacket requestPacket;

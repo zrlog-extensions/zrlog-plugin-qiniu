@@ -1,5 +1,7 @@
 package com.zrlog.plugin.qiniu;
 
+import com.zrlog.plugin.RunConstants;
+import com.zrlog.plugin.type.RunType;
 import com.zrlog.plugin.common.PluginNativeImageUtils;
 import com.zrlog.plugin.qiniu.controller.QiniuController;
 import com.zrlog.plugin.qiniu.service.QiniuStaticSyncService;
@@ -14,6 +16,7 @@ public class GraalvmAgentApplication {
 
 
     public static void main(String[] args) throws IOException, InstantiationException, IllegalAccessException, InvocationTargetException {
+        RunConstants.runType = RunType.AGENT;
         //upload need set content-type
         PluginNativeImageUtils.usedGsonObject();
         //Class<?> aClass = Class.forName("com.qiniu.util.UC$UCRet");

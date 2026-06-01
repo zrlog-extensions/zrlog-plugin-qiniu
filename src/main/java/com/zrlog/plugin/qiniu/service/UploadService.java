@@ -36,6 +36,7 @@ import java.util.logging.Logger;
         label = "上传到七牛云存储",
         description = "上传文章附件和生成资源到七牛云存储。",
         exposure = {"internal"},
+        riskLevel = "medium",
         timeoutSeconds = 120
 )
 public class UploadService implements IPluginService {

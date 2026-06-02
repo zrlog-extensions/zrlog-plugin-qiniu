@@ -3,6 +3,7 @@ import {
     Col,
     Divider,
     Form,
+    Grid,
     Input,
     Row,
     Space,
@@ -53,6 +54,9 @@ const switchValue = (value?: boolean) => value ? "on" : "off";
 
 const StorageSettings: FunctionComponent<StorageSettingsProps> = ({data}) => {
     const {token} = theme.useToken();
+    const screens = Grid.useBreakpoint();
+    const isPhone = Boolean(screens.xs && !screens.sm);
+    const isCompact = !screens.md;
     const [form] = Form.useForm<StorageFormValues>();
     const [loading, setLoading] = useState(false);
     const [messageApi, contextHolder] = message.useMessage();
@@ -66,19 +70,19 @@ const StorageSettings: FunctionComponent<StorageSettingsProps> = ({data}) => {
     const shellStyle = useMemo(() => ({
         maxWidth: 980,
         margin: "0 auto",
-        padding: 24,
+        padding: isPhone ? 12 : isCompact ? 16 : 24,
         color: token.colorText,
         background: token.colorBgLayout,
         minHeight: "100vh",
         boxSizing: "border-box" as const,
-    }), [token]);
+    }), [isCompact, isPhone, token]);
 
     const panelStyle = useMemo(() => ({
-        padding: 24,
+        padding: isPhone ? 16 : 24,
         border: `1px solid ${token.colorBorderSecondary}`,
         borderRadius: 8,
         background: token.colorBgContainer,
-    }), [token]);
+    }), [isPhone, token]);
 
     const submit = async (values: StorageFormValues) => {
         setLoading(true);
@@ -126,14 +130,14 @@ const StorageSettings: FunctionComponent<StorageSettingsProps> = ({data}) => {
             <Space direction="vertical" size={20} style={{width: "100%"}}>
                 <div style={{display: "flex", justifyContent: "space-between", gap: 16, flexWrap: "wrap"}}>
                     <Space direction="vertical" size={4}>
-                        <Space wrap>
-                            <Typography.Title level={3} style={{margin: 0}}>{provider.title || data.plugin.name}</Typography.Title>
+                        <Space wrap style={{maxWidth: "100%"}}>
+                            <Typography.Title level={3} style={{margin: 0, fontSize: isPhone ? 20 : undefined}}>{provider.title || data.plugin.name}</Typography.Title>
                             <Tag>v{version}</Tag>
                         </Space>
-                        <Typography.Text type="secondary">{data.plugin.desc}</Typography.Text>
+                        <Typography.Text type="secondary" style={{display: "block", maxWidth: "100%"}}>{data.plugin.desc}</Typography.Text>
                     </Space>
                     {provider.helpUrl ? (
-                        <Button icon={<QuestionCircleOutlined/>} href={provider.helpUrl} target="_blank">
+                        <Button icon={<QuestionCircleOutlined/>} href={provider.helpUrl} target="_blank" style={isPhone ? {width: "100%"} : undefined}>
                             帮助文档
                         </Button>
                     ) : null}
@@ -141,7 +145,7 @@ const StorageSettings: FunctionComponent<StorageSettingsProps> = ({data}) => {
 
                 <div style={panelStyle}>
                     <Form form={form} layout="vertical" onFinish={submit} requiredMark={false}>
-                        <Row gutter={16}>
+                        <Row gutter={[isCompact ? 12 : 16, 0]}>
                             <Col xs={24} md={12}>
                                 <Form.Item label="AccessKey" name="access_key">
                                     <Input autoComplete="off"/>
@@ -208,7 +212,7 @@ const StorageSettings: FunctionComponent<StorageSettingsProps> = ({data}) => {
 
                         <Divider/>
 
-                        <Button type="primary" htmlType="submit" icon={<SaveOutlined/>} loading={loading}>
+                        <Button type="primary" htmlType="submit" icon={<SaveOutlined/>} loading={loading} style={isPhone ? {width: "100%"} : undefined}>
                             保存
                         </Button>
                     </Form>

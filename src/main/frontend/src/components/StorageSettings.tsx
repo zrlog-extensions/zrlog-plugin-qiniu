@@ -153,18 +153,18 @@ const StorageSettings: FunctionComponent<StorageSettingsProps> = ({data}) => {
                                 </Form.Item>
                             </Col>
                             <Col xs={24} md={12}>
-                                <Form.Item label="域名" name="host">
+                                <Form.Item label="访问域名" name="host">
                                     <Input placeholder="例如：static.example.com"/>
                                 </Form.Item>
                             </Col>
                             <Col xs={24} md={12}>
-                                <Form.Item label="仓库名" name="bucket">
+                                <Form.Item label="Bucket 名称" name="bucket">
                                     <Input/>
                                 </Form.Item>
                             </Col>
                             {provider.privateBucket ? (
                                 <Col xs={24} md={12}>
-                                    <Form.Item label="私有仓库名" name="private_bucket">
+                                    <Form.Item label="私有 Bucket 名称" name="private_bucket">
                                         <Input placeholder="用于数据库备份等私有文件"/>
                                     </Form.Item>
                                 </Col>
@@ -192,7 +192,7 @@ const StorageSettings: FunctionComponent<StorageSettingsProps> = ({data}) => {
                                 <Switch checkedChildren="同步" unCheckedChildren="关闭"/>
                             </Form.Item>
                             <Typography.Text type="secondary">
-                                <CloudSyncOutlined/> 需要主题支持静态资源同步
+                                <CloudSyncOutlined/> 开启后会同步当前主题暴露的静态资源。
                             </Typography.Text>
                             {provider.syncHtml ? (
                                 <Form.Item label="静态缓存 HTML 文件同步" name="syncHtml" valuePropName="checked" style={{marginBottom: 0}}>

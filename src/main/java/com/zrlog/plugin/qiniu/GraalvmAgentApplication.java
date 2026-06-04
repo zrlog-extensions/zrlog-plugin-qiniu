@@ -9,24 +9,17 @@ import com.zrlog.plugin.qiniu.service.UploadService;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 
 public class GraalvmAgentApplication {
 
 
-    public static void main(String[] args) throws IOException, InstantiationException, IllegalAccessException, InvocationTargetException {
+    public static void main(String[] args) throws IOException, ReflectiveOperationException {
         RunConstants.runType = RunType.AGENT;
         //upload need set content-type
         PluginNativeImageUtils.usedGsonObject();
-        //Class<?> aClass = Class.forName("com.qiniu.util.UC$UCRet");
-        //Object decode = Json.decode("{}", aClass);
-        //System.out.println("decode = " + decode);
-        //RefreshObjectCachesResponse refreshObjectCachesResponse = new RefreshObjectCachesResponse();
-        //refreshObjectCachesResponse.setRefreshTaskId("");
-        //refreshObjectCachesResponse.setRequestId("");
-        UploadService.class.newInstance();
-        QiniuStaticSyncService.class.newInstance();
+        UploadService.class.getDeclaredConstructor().newInstance();
+        QiniuStaticSyncService.class.getDeclaredConstructor().newInstance();
         String basePath = System.getProperty("user.dir").replace("\\target", "").replace("/target", "");
         //PathKit.setRootPath(basePath);
         File file = new File(basePath + "/src/main/resources");

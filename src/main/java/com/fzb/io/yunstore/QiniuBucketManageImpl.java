@@ -11,6 +11,7 @@ import com.qiniu.storage.persistent.FileRecorder;
 import com.qiniu.util.Auth;
 import com.qiniu.util.Etag;
 import com.zrlog.plugin.common.IOUtil;
+import com.zrlog.plugin.common.LoggerUtil;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,8 +20,12 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class QiniuBucketManageImpl implements FileManageAPI {
+
+    private static final Logger LOGGER = LoggerUtil.getLogger(QiniuBucketManageImpl.class);
 
     private final Map<String, Object> responseData = new HashMap<String, Object>();
 
@@ -71,7 +76,7 @@ public class QiniuBucketManageImpl implements FileManageAPI {
             IOUtil.writeBytesToFile(IOUtil.getByteByInputStream(in), file);
             create(file, key);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Create qiniu temp file failed", e);
         }
         return null;
     }
@@ -92,6 +97,7 @@ public class QiniuBucketManageImpl implements FileManageAPI {
                     }
                 }
             } catch (IOException e) {
+                LOGGER.log(Level.WARNING, "Check qiniu duplicate file failed: " + key, e);
             }
         }
         try {
@@ -102,7 +108,7 @@ public class QiniuBucketManageImpl implements FileManageAPI {
             responseData.put("url", url);
             return responseData;
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Upload qiniu file failed: " + key, e);
         }
         return responseData;
     }

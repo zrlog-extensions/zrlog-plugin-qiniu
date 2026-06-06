@@ -8,7 +8,6 @@ import {
     Row,
     Space,
     Switch,
-    Tag,
     Typography,
     message,
     theme,
@@ -61,7 +60,6 @@ const StorageSettings: FunctionComponent<StorageSettingsProps> = ({data}) => {
     const [loading, setLoading] = useState(false);
     const [messageApi, contextHolder] = message.useMessage();
     const provider = data.provider;
-    const version = data.config.version || data.plugin.version;
 
     useEffect(() => {
         form.setFieldsValue(toFormValues(data.config || {}));
@@ -130,10 +128,7 @@ const StorageSettings: FunctionComponent<StorageSettingsProps> = ({data}) => {
             <Space direction="vertical" size={20} style={{width: "100%"}}>
                 <div style={{display: "flex", justifyContent: "space-between", gap: 16, flexWrap: "wrap"}}>
                     <Space direction="vertical" size={4}>
-                        <Space wrap style={{maxWidth: "100%"}}>
-                            <Typography.Title level={3} style={{margin: 0, fontSize: isPhone ? 20 : undefined}}>{provider.title || data.plugin.name}</Typography.Title>
-                            <Tag>v{version}</Tag>
-                        </Space>
+                        <Typography.Title level={3} style={{margin: 0, fontSize: isPhone ? 20 : undefined}}>{provider.title || data.plugin.name}</Typography.Title>
                         <Typography.Text type="secondary" style={{display: "block", maxWidth: "100%"}}>{data.plugin.desc}</Typography.Text>
                     </Space>
                     {provider.helpUrl ? (

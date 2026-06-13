@@ -224,6 +224,7 @@
                                     -H:+BuildReport
                                     -H:+AddAllCharsets
                                     -H:+UnlockExperimentalVMOptions
+                                    -H:-ReduceImplicitExceptionStackTraceInformation
                                     --initialize-at-build-time=UCRet
                                     --initialize-at-build-time=sun.security.krb5.SCDynamicStoreConfig
                                     --initialize-at-build-time=java.util.ImmutableCollections$ListN

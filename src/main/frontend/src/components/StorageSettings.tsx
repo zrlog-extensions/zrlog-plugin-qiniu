@@ -191,7 +191,7 @@ const StorageSettings: FunctionComponent<StorageSettingsProps> = ({data}) => {
                                 <Switch checkedChildren="同步" unCheckedChildren="关闭"/>
                             </Form.Item>
                             <Typography.Text type="secondary">
-                                <CloudSyncOutlined/> 开启后会同步当前主题的静态资源。
+                                <CloudSyncOutlined/> 开启后会同步当前主题的静态资源
                             </Typography.Text>
                             {provider.syncHtml ? (
                                 <Form.Item label="静态缓存 HTML 文件同步" name="syncHtml" valuePropName="checked" style={{marginBottom: 0}}>

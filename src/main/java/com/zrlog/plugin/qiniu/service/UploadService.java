@@ -8,7 +8,6 @@ import com.zrlog.plugin.IOSession;
 import com.zrlog.plugin.api.Capability;
 import com.zrlog.plugin.api.IPluginService;
 import com.zrlog.plugin.api.Service;
-import com.zrlog.plugin.common.IdUtil;
 import com.zrlog.plugin.common.LoggerUtil;
 import com.zrlog.plugin.common.response.UploadFileResponse;
 import com.zrlog.plugin.common.response.UploadFileResponseEntry;
@@ -45,9 +44,9 @@ public class UploadService implements IPluginService {
 
     @Override
     public void handle(final IOSession ioSession, final MsgPacket requestPacket) {
-        Map<String, Object> rawRequest = new Gson().fromJson(requestPacket.getDataStr(), Map.class);
-        Map<String, Object> request = requestPayload(requestPacket, rawRequest);
-        List<String> fileInfoList = fileInfoList(request.get("fileInfo"));
+        UploadServiceRequest rawRequest = new Gson().fromJson(requestPacket.getDataStr(), UploadServiceRequest.class);
+        UploadServiceRequest request = requestPayload(requestPacket, rawRequest);
+        List<String> fileInfoList = request.fileInfoList();
         List<UploadFile> uploadFileList = new ArrayList<>();
         for (String fileInfo : fileInfoList) {
             UploadFile uploadFile = new UploadFile();
@@ -61,45 +60,27 @@ public class UploadService implements IPluginService {
             uploadFileList.add(uploadFile);
         }
         UploadFileResponse uploadFileResponse = upload(ioSession, uploadFileList);
-        List<Map<String, Object>> responseList = new ArrayList<>();
-        for (UploadFileResponseEntry entry : uploadFileResponse) {
-            Map<String, Object> map = new HashMap<>();
-            map.put("url", entry.getUrl());
-            responseList.add(map);
-        }
         if (Objects.equals(ActionType.CAPABILITY_INVOKE.name(), requestPacket.getMethodStr())) {
             CapabilityInvokeResult result = new CapabilityInvokeResult();
             result.setSuccess(true);
             Map<String, Object> data = new HashMap<>();
-            data.put("items", responseList);
+            data.put("items", uploadFileResponse);
             result.setData(data);
             ioSession.sendJsonMsg(result, requestPacket.getMethodStr(), requestPacket.getMsgId(), MsgPacketStatus.RESPONSE_SUCCESS);
         } else {
-            ioSession.sendMsg(ContentType.JSON, responseList, requestPacket.getMethodStr(), requestPacket.getMsgId(), MsgPacketStatus.RESPONSE_SUCCESS);
+            ioSession.sendMsg(ContentType.JSON, uploadFileResponse, requestPacket.getMethodStr(), requestPacket.getMsgId(), MsgPacketStatus.RESPONSE_SUCCESS);
         }
     }
 
-    private Map<String, Object> requestPayload(MsgPacket requestPacket, Map<String, Object> rawRequest) {
+    private UploadServiceRequest requestPayload(MsgPacket requestPacket, UploadServiceRequest rawRequest) {
         if (rawRequest == null) {
-            return new HashMap<String, Object>();
+            return new UploadServiceRequest();
         }
-        Object payload = rawRequest.get("payload");
-        if (Objects.equals(ActionType.CAPABILITY_INVOKE.name(), requestPacket.getMethodStr()) && payload instanceof Map) {
-            return (Map<String, Object>) payload;
+        if (Objects.equals(ActionType.CAPABILITY_INVOKE.name(), requestPacket.getMethodStr())
+                && rawRequest.getPayload() != null) {
+            return rawRequest.getPayload();
         }
         return rawRequest;
-    }
-
-    private List<String> fileInfoList(Object rawFileInfo) {
-        List<String> fileInfoList = new ArrayList<String>();
-        if (rawFileInfo instanceof List) {
-            for (Object item : (List) rawFileInfo) {
-                if (item != null) {
-                    fileInfoList.add(item.toString());
-                }
-            }
-        }
-        return fileInfoList;
     }
 
     public UploadFileResponse upload(IOSession session, final List<UploadFile> uploadFileList) {
@@ -107,12 +88,9 @@ public class UploadService implements IPluginService {
         if (uploadFileList != null && !uploadFileList.isEmpty()) {
             final Map<String, Object> keyMap = new HashMap<>();
             keyMap.put("key", "bucket,access_key,secret_key,host");
-            int msgId = IdUtil.getInt();
-            session.sendJsonMsg(keyMap, ActionType.GET_WEBSITE.name(), msgId, MsgPacketStatus.SEND_REQUEST, null);
-            MsgPacket packet = session.getResponseMsgPacketByMsgId(msgId);
-            Map<String, String> responseMap = new Gson().fromJson(packet.getDataStr(), Map.class);
+            QiniuStorageConfig config = session.getResponseSync(ContentType.JSON, keyMap, ActionType.GET_WEBSITE, QiniuStorageConfig.class);
             for (UploadFile uploadFile : uploadFileList) {
-                BucketVO bucket = new BucketVO(responseMap.get("bucket"), responseMap.get("access_key"), responseMap.get("secret_key"), responseMap.get("host"));
+                BucketVO bucket = new BucketVO(config.getBucket(), config.getAccessKey(), config.getSecretKey(), config.getHost());
                 response.add(doUpload(bucket, uploadFile));
             }
         }

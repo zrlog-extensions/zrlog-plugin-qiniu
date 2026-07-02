@@ -1,6 +1,8 @@
 package com.zrlog.plugin.qiniu.timer;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.zrlog.plugin.IOSession;
 import com.zrlog.plugin.common.FileUtils;
 import com.zrlog.plugin.common.IdUtil;
@@ -12,6 +14,7 @@ import com.zrlog.plugin.common.response.UploadFileResponse;
 import com.zrlog.plugin.data.codec.ContentType;
 import com.zrlog.plugin.data.codec.MsgPacketStatus;
 import com.zrlog.plugin.qiniu.entry.UploadFile;
+import com.zrlog.plugin.qiniu.service.QiniuStorageConfig;
 import com.zrlog.plugin.qiniu.service.UploadService;
 import com.zrlog.plugin.type.ActionType;
 
@@ -24,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
-import java.util.TreeMap;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -50,16 +52,16 @@ public class SyncTemplateStaticResourceRunnable implements Runnable {
         try {
             Map<String, Object> map = new HashMap<>();
             map.put("key", "syncTemplate," + CACHE_KEY);
-            Map<String, String> responseMap = (Map<String, String>) session.getResponseSync(ContentType.JSON, map, ActionType.GET_WEBSITE, Map.class);
-            if (responseMap == null) {
+            QiniuStorageConfig syncConfig = session.getResponseSync(ContentType.JSON, map, ActionType.GET_WEBSITE, QiniuStorageConfig.class);
+            if (syncConfig == null) {
                 markResult(true, 0, "未读取到静态同步配置。");
                 return;
             }
-            if (!"on".equals(responseMap.get("syncTemplate"))) {
+            if (!syncConfig.isSyncTemplateEnabled()) {
                 markResult(true, 0, "静态资源同步未启用。");
                 return;
             }
-            Map<String, String> fileInfoCacheMap = preloadCache(responseMap);
+            Map<String, String> fileInfoCacheMap = preloadCache(syncConfig);
             Map<String, String> nextFileInfoCacheMap = new HashMap<>(fileInfoCacheMap);
             TemplatePath templatePath = session.getResponseSync(ContentType.JSON, new HashMap<>(), ActionType.CURRENT_TEMPLATE, TemplatePath.class);
             BlogRunTime blogRunTime = session.getResponseSync(ContentType.JSON, new HashMap<>(), ActionType.BLOG_RUN_TIME, BlogRunTime.class);
@@ -80,18 +82,34 @@ public class SyncTemplateStaticResourceRunnable implements Runnable {
         }
     }
 
-    private Map<String, String> preloadCache(Map<String, String> responseMap) {
-        String cacheMapStr = responseMap.get(CACHE_KEY);
+    private Map<String, String> preloadCache(QiniuStorageConfig syncConfig) {
+        String cacheMapStr = syncConfig.getCacheMap();
         if (Objects.nonNull(cacheMapStr) && !cacheMapStr.isEmpty()) {
-            return new Gson().fromJson(cacheMapStr, Map.class);
+            return parseCacheMap(cacheMapStr);
         }
         return new HashMap<>();
     }
 
+    private Map<String, String> parseCacheMap(String cacheMapStr) {
+        JsonObject jsonObject = new Gson().fromJson(cacheMapStr, JsonObject.class);
+        Map<String, String> cacheMap = new HashMap<>();
+        if (jsonObject == null) {
+            return cacheMap;
+        }
+        for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
+            JsonElement value = entry.getValue();
+            if (value == null || value.isJsonNull()) {
+                continue;
+            }
+            cacheMap.put(entry.getKey(), value.isJsonPrimitive() ? value.getAsString() : value.toString());
+        }
+        return cacheMap;
+    }
+
     private void saveCacheToDb(Map<String, String> fileInfoCacheMap) {
-        Map<String, String> newCacheMap = new TreeMap<>();
-        newCacheMap.put(CACHE_KEY, new Gson().toJson(fileInfoCacheMap));
-        session.sendJsonMsg(newCacheMap, ActionType.SET_WEBSITE.name(), IdUtil.getInt(), MsgPacketStatus.SEND_REQUEST);
+        QiniuStorageConfig syncConfig = new QiniuStorageConfig();
+        syncConfig.setCacheMap(new Gson().toJson(fileInfoCacheMap));
+        session.sendJsonMsg(syncConfig, ActionType.SET_WEBSITE.name(), IdUtil.getInt(), MsgPacketStatus.SEND_REQUEST);
     }
 
     private List<UploadFile> templateUploadFiles(BlogRunTime blogRunTime,

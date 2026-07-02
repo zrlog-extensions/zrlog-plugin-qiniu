@@ -7,11 +7,11 @@ import com.zrlog.plugin.data.codec.ContentType;
 import com.zrlog.plugin.data.codec.HttpRequestInfo;
 import com.zrlog.plugin.data.codec.MsgPacket;
 import com.zrlog.plugin.data.codec.MsgPacketStatus;
+import com.zrlog.plugin.qiniu.service.QiniuStorageConfig;
 import com.zrlog.plugin.type.ActionType;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * Created by xiaochun on 2016/2/13.
@@ -32,10 +32,8 @@ public class QiniuController {
     }
 
     public void update() {
-        session.sendMsg(new MsgPacket(requestInfo.simpleParam(), ContentType.JSON, MsgPacketStatus.SEND_REQUEST, IdUtil.getInt(), ActionType.SET_WEBSITE.name()), msgPacket -> {
-            Map<String, Object> map = new HashMap<>();
-            map.put("success", true);
-            session.sendMsg(new MsgPacket(map, ContentType.JSON, MsgPacketStatus.RESPONSE_SUCCESS, requestPacket.getMsgId(), requestPacket.getMethodStr()));
+        session.sendMsg(new MsgPacket(requestConfig(), ContentType.JSON, MsgPacketStatus.SEND_REQUEST, IdUtil.getInt(), ActionType.SET_WEBSITE.name()), msgPacket -> {
+            session.sendMsg(new MsgPacket(StorageApiResponse.success(), ContentType.JSON, MsgPacketStatus.RESPONSE_SUCCESS, requestPacket.getMsgId(), requestPacket.getMethodStr()));
         });
     }
 
@@ -46,62 +44,57 @@ public class QiniuController {
     public void index() {
         Map<String, Object> data = new HashMap<>();
         data.put("theme", isDarkMode() ? "dark" : "light");
-        data.put("data", gson.toJson(pageData()));
+        data.put("data", gson.toJson(StorageApiResponse.success(pageData())));
         session.responseHtml("/templates/index", data, requestPacket.getMethodStr(), requestPacket.getMsgId());
     }
 
     public void json() {
-        response(pageData());
+        response(StorageApiResponse.success(pageData()));
     }
 
-    private Map<String, Object> pageData() {
-        Map<String, Object> data = new HashMap<>();
-        data.put("dark", isDarkMode());
-        data.put("colorPrimary", getAdminColorPrimary());
-        data.put("plugin", session.getPlugin());
-        data.put("provider", provider());
-        data.put("config", loadConfig());
-        return successMap(data);
+    private StorageInfoResponse<QiniuStorageConfig> pageData() {
+        StorageInfoResponse<QiniuStorageConfig> data = new StorageInfoResponse<QiniuStorageConfig>();
+        data.setDark(isDarkMode());
+        data.setColorPrimary(getAdminColorPrimary());
+        data.setPlugin(session.getPlugin());
+        data.setProvider(provider());
+        data.setConfig(loadConfig());
+        return data;
     }
 
-    private Map<String, Object> provider() {
-        Map<String, Object> provider = new HashMap<>();
-        provider.put("key", "qiniu");
-        provider.put("title", "七牛云对象存储设置");
-        provider.put("helpUrl", "https://blog.zrlog.com/qiniu-install.html");
-        provider.put("regionLabel", "");
-        provider.put("privateBucket", false);
-        provider.put("appId", false);
-        provider.put("syncHtml", false);
-        provider.put("supportHttps", false);
-        return provider;
+    private StorageProvider provider() {
+        return new StorageProvider("qiniu", "七牛云对象存储设置", "https://blog.zrlog.com/qiniu-install.html",
+                "", false, false, false, false);
     }
 
-    private Map<String, Object> loadConfig() {
-        Map<String, Object> keyMap = new HashMap<>();
-        keyMap.put("key", CONFIG_KEYS);
-        Map response = session.getResponseSync(ContentType.JSON, keyMap, ActionType.GET_WEBSITE, Map.class);
-        Map<String, Object> config = response == null ? new HashMap<>() : new HashMap<>(response);
-        normalizeSwitch(config, "syncTemplate");
-        config.put("version", session.getPlugin().getVersion());
+    private QiniuStorageConfig loadConfig() {
+        QiniuStorageConfig config = session.getResponseSync(ContentType.JSON, WebsiteKeyRequest.of(CONFIG_KEYS), ActionType.GET_WEBSITE, QiniuStorageConfig.class);
+        if (config == null) {
+            config = new QiniuStorageConfig();
+        }
+        config.normalizeForPage(session.getPlugin().getVersion());
         return config;
     }
 
-    private void normalizeSwitch(Map<String, Object> config, String key) {
-        if (!Objects.equals(config.get(key), "on")) {
-            config.put(key, "off");
+    private QiniuStorageConfig requestConfig() {
+        QiniuStorageConfig config = new QiniuStorageConfig();
+        config.setAccessKey(paramValue("access_key"));
+        config.setSecretKey(paramValue("secret_key"));
+        config.setHost(paramValue("host"));
+        config.setBucket(paramValue("bucket"));
+        config.setSyncTemplate(paramValue("syncTemplate"));
+        return config;
+    }
+
+    private void response(Object data) {
+        session.sendMsg(ContentType.JSON, data, requestPacket.getMethodStr(), requestPacket.getMsgId(), MsgPacketStatus.RESPONSE_SUCCESS);
+    }
+
+    private String paramValue(String key) {
+        if (requestInfo.getParam() == null || requestInfo.getParam().get(key) == null || requestInfo.getParam().get(key).length == 0) {
+            return "";
         }
-    }
-
-    private Map<String, Object> successMap(Object data) {
-        Map<String, Object> map = new HashMap<>();
-        map.put("success", true);
-        map.put("data", data);
-        return map;
-    }
-
-    private void response(Map<String, Object> map) {
-        session.sendMsg(ContentType.JSON, map, requestPacket.getMethodStr(), requestPacket.getMsgId(), MsgPacketStatus.RESPONSE_SUCCESS);
+        return requestInfo.getParam().get(key)[0];
     }
 
     private boolean isDarkMode() {

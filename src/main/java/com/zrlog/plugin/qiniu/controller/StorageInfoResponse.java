@@ -1,8 +1,12 @@
 package com.zrlog.plugin.qiniu.controller;
 
+import com.zrlog.plugin.data.codec.PluginAppearance;
+
 import com.zrlog.plugin.message.Plugin;
 
 public class StorageInfoResponse<T> {
+
+    private PluginAppearance appearance;
 
     private boolean dark;
     private String colorPrimary;
@@ -48,5 +52,8 @@ public class StorageInfoResponse<T> {
 
     public void setConfig(T config) {
         this.config = config;
+    }
+    public void setAppearance(PluginAppearance appearance) {
+        this.appearance = appearance;
     }
 }

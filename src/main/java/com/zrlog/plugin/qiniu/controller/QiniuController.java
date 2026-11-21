@@ -7,6 +7,7 @@ import com.zrlog.plugin.data.codec.ContentType;
 import com.zrlog.plugin.data.codec.HttpRequestInfo;
 import com.zrlog.plugin.data.codec.MsgPacket;
 import com.zrlog.plugin.data.codec.MsgPacketStatus;
+import com.zrlog.plugin.data.codec.PluginAppearance;
 import com.zrlog.plugin.qiniu.service.QiniuStorageConfig;
 import com.zrlog.plugin.type.ActionType;
 
@@ -43,7 +44,7 @@ public class QiniuController {
 
     public void index() {
         Map<String, Object> data = new HashMap<>();
-        data.put("theme", isDarkMode() ? "dark" : "light");
+
         data.put("data", gson.toJson(StorageApiResponse.success(pageData())));
         session.responseHtml("/templates/index", data, requestPacket.getMethodStr(), requestPacket.getMsgId());
     }
@@ -54,6 +55,7 @@ public class QiniuController {
 
     private StorageInfoResponse<QiniuStorageConfig> pageData() {
         StorageInfoResponse<QiniuStorageConfig> data = new StorageInfoResponse<QiniuStorageConfig>();
+        data.setAppearance(PluginAppearance.from(requestInfo));
         data.setDark(isDarkMode());
         data.setColorPrimary(getAdminColorPrimary());
         data.setPlugin(session.getPlugin());

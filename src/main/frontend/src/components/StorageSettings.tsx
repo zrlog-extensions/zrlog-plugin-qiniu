@@ -1,18 +1,20 @@
+import Input from "@zrlog/ui/antd/Input";
+import Switch from "@zrlog/ui/antd/Switch";
+import Typography from "@zrlog/ui/antd/Typography";
+import {useUiApp} from "@zrlog/ui/feedback";
+import CloudSyncOutlined from "@zrlog/ui/icons/sync";
+import QuestionCircleOutlined from "@zrlog/ui/icons/help";
+import SaveOutlined from "@zrlog/ui/icons/save";
 import {
     Button,
     Col,
     Divider,
     Form,
     Grid,
-    Input,
     Row,
     Space,
-    Switch,
-    Typography,
-    message,
     theme,
 } from "antd";
-import {CloudSyncOutlined, QuestionCircleOutlined, SaveOutlined} from "@ant-design/icons";
 import axios from "axios";
 import {FunctionComponent, useEffect, useMemo, useState} from "react";
 import {StandardResponse, StorageConfig, StorageInfoResponse} from "../index";
@@ -58,7 +60,7 @@ const StorageSettings: FunctionComponent<StorageSettingsProps> = ({data}) => {
     const isCompact = !screens.md;
     const [form] = Form.useForm<StorageFormValues>();
     const [loading, setLoading] = useState(false);
-    const [messageApi, contextHolder] = message.useMessage();
+    const {message: messageApi} = useUiApp();
     const provider = data.provider;
 
     useEffect(() => {
@@ -124,7 +126,6 @@ const StorageSettings: FunctionComponent<StorageSettingsProps> = ({data}) => {
 
     return (
         <div style={shellStyle}>
-            {contextHolder}
             <Space direction="vertical" size={20} style={{width: "100%"}}>
                 <div style={{display: "flex", justifyContent: "space-between", gap: 16, flexWrap: "wrap"}}>
                     <Space direction="vertical" size={4}>
